@@ -17,35 +17,35 @@ import pkg from '../package.json';
  * output (build) folder.
  */
 async function copy({ watch } = {}) {
-  const ncp = Promise.promisify(require('ncp'));
+    const ncp = Promise.promisify(require('ncp'));
 
-  await Promise.all([
-    ncp('src/public', 'build/public'),
-    ncp('src/content', 'build/content'),
-  ]);
+    await Promise.all([
+        ncp('src/public', 'build/public'),
+        ncp('src/content', 'build/content'),
+    ]);
 
-  await fs.writeFile('./build/package.json', JSON.stringify({
-    private: true,
-    engines: pkg.engines,
-    dependencies: pkg.dependencies,
-    scripts: {
-      start: 'node server.js',
-    },
-  }, null, 2));
+    await fs.writeFile('./build/package.json', JSON.stringify({
+        private: true,
+        engines: pkg.engines,
+        dependencies: pkg.dependencies,
+        scripts: {
+            start: 'node server.js',
+        },
+    }, null, 2));
 
-  if (watch) {
-    const watcher = await new Promise((resolve, reject) => {
-      gaze('src/content/**/*.*', (err, val) => err ? reject(err) : resolve(val));
-    });
-
-    const cp = async (file) => {
-      const relPath = file.substr(path.join(__dirname, '../src/content/').length);
-      await ncp(`src/content/${relPath}`, `build/content/${relPath}`);
-    };
-
-    watcher.on('changed', cp);
-    watcher.on('added', cp);
-  }
+    if (watch) {
+        const watcher = await new Promise((resolve, reject) => {
+            gaze('src/content/**/*.*', (err, val) => {
+                err ? reject(err) : resolve(val);
+            });
+        });
+        const cp = async(file) => {
+            const relPath = file.substr(path.join(__dirname, '../src/content/').length);
+            await ncp(`src/content/${relPath}`, `build/content/${relPath}`);
+        };
+        watcher.on('changed', cp);
+        watcher.on('added', cp);
+    }
 }
 
 export default copy;
