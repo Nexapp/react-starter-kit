@@ -1,0 +1,23 @@
+/**
+* Global file like this will not be localized by universal-style-loader plugin. Every class in this file will be global to the entire application
+ */
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+*::before,
+*::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+::-ms-clear,
+::-ms-reveal {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
