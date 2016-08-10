@@ -19,7 +19,7 @@ import {
     NotFoundPage,
 } from './containers';
 
-export default () => {
+export default (store) => {
     return (
         <Route>
             <Route path="/" component={App}>

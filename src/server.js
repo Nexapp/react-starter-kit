@@ -18,6 +18,7 @@ import jwt from 'jsonwebtoken';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import { createMemoryHistory, match, RouterContext } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
 import PrettyError from 'pretty-error';
 import passport from './core/passport';
 import models from './data/models';
@@ -28,6 +29,9 @@ import Html from './components/Html/Html';
 import { ErrorPage } from './containers/errorPage/ErrorPage';
 import errorPageStyle from './containers/errorPage/ErrorPage.css';
 import { port, auth } from './config';
+import { Provider } from 'react-redux';
+import configureStore from './redux/configureStore';
+import { setRuntimeVariable } from './redux/reducers/runtime';
 import assets from './assets'; // eslint-disable-line import/no-unresolved
 
 const app = express();
@@ -85,9 +89,16 @@ app.use('/graphql', expressGraphQL(req => ({
 // -----------------------------------------------------------------------------
 app.get('*', async(req, res, next) => {
     try {
-        const history = createMemoryHistory(req.url);
+        const memoryHistory = createMemoryHistory(req.url);
+        const store = configureStore(memoryHistory, {});
+        const history = syncHistoryWithStore(memoryHistory, store);
 
-        match({ history, routes: getRoutes(), location: req.url }, (error, redirectLocation, renderProps) => {
+        store.dispatch(setRuntimeVariable({
+            name: 'initialNow',
+            value: Date.now(),
+        }));
+
+        match({ history, routes: getRoutes(store), location: req.url }, (error, redirectLocation, renderProps) => {
             if (error) {
                 throw error;
             }
@@ -105,6 +116,7 @@ app.get('*', async(req, res, next) => {
                 script: assets.main.js
             };
             const context = {
+                store,
                 onPageNotFound: () => statusCode = 404,
                 insertCss(...styles) {
                     styles.forEach(style => css.add(style._getCss()));
@@ -113,9 +125,11 @@ app.get('*', async(req, res, next) => {
 
             // Fire all componentWill... hooks
             data.children = ReactDOM.renderToString(
-                <ContextHolder context={context}>
-                    <RouterContext {...renderProps} />
-                </ContextHolder>
+                <Provider store={store}>
+                    <ContextHolder context={context}>
+                        <RouterContext {...renderProps} />
+                    </ContextHolder>
+                </Provider>
             );
 
             // If you have async actions, wait for store stabilizes here.
@@ -128,6 +142,7 @@ app.get('*', async(req, res, next) => {
             // It is important to have rendered output and state in sync,
             // otherwise React will write error to console when mounting on client
 
+            data.state = JSON.stringify(store.getState());
             data.css = [...css].join('');
             const html = ReactDOM.renderToString(<Html {...data} />);
             res.status(statusCode);
