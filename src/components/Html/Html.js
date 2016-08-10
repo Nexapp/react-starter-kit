@@ -47,7 +47,6 @@ function Html(props) {
                 <script
                     id="source"
                     src={props.script}
-                    data-initial-state={props.state}
                     async defer />
                 {
                 process.env.NODE_ENV === 'production' &&
@@ -69,7 +68,6 @@ function Html(props) {
 Html.propTypes = {
     css: PropTypes.string.isRequired,
     children: PropTypes.string.isRequired,
-    state: PropTypes.string,
     script: PropTypes.string,
 };
 

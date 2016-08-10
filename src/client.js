@@ -12,10 +12,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import FastClick from 'fastclick';
 import { match, Router, browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
 import getRoutes from './routes';
-import { Provider } from 'react-redux';
-import configureStore from './redux/configureStore';
 import ContextHolder from './core/ContextHolder';
 import withScroll from 'scroll-behavior';
 
@@ -40,31 +37,23 @@ const trackPageview = () => {
 
 function run() {
     const container = document.getElementById('container');
-    const initialState = JSON.parse(
-        document.getElementById('source').getAttribute('data-initial-state')
-    );
 
     // Make taps on links and buttons work fast on mobiles
     FastClick.attach(document.body);
 
-    const scrollHistory = withScroll(browserHistory);
-    const store = configureStore(scrollHistory, initialState);
-    context.store = store;
-    const history = syncHistoryWithStore(scrollHistory, store);
+    const history = withScroll(browserHistory);
 
     history.listen(location => {
         trackPageview();
     });
 
-    const routes = getRoutes(store);
+    const routes = getRoutes();
 
     match({ history, routes }, (error, redirectLocation, renderProps) => {
         ReactDOM.render(
-            <Provider store={store}>
-                <ContextHolder context={context}>
-                    <Router {...renderProps} />
-                </ContextHolder>
-            </Provider>,
+            <ContextHolder context={context}>
+                <Router {...renderProps} />
+            </ContextHolder>,
             container);
 
         // Remove the pre-rendered CSS because it's no longer used

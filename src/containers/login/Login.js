@@ -27,8 +27,7 @@ function Login(props) {
                             className={s.icon}
                             width="30"
                             height="30"
-                            viewBox="0 0 30 30"
-                            xmlns="http://www.w3.org/2000/svg">
+                            viewBox="0 0 30 30">
                             <path
                                 d="M22 16l1-5h-5V7c0-1.544.784-2 3-2h2V0h-4c-4.072 0-7 2.435-7 7v4H7v5h5v14h6V16h4z" />
                         </svg>
@@ -41,8 +40,7 @@ function Login(props) {
                             className={s.icon}
                             width="30"
                             height="30"
-                            viewBox="0 0 30 30"
-                            xmlns="http://www.w3.org/2000/svg" >
+                            viewBox="0 0 30 30">
                             <path d={'M30 13h-4V9h-2v4h-4v2h4v4h2v-4h4m-15 2s-2-1.15-2-2c0 0-.5-1.828 1-3 ' +
                '1.537-1.2 3-3.035 3-5 0-2.336-1.046-5-3-6h3l2.387-1H10C5.835 0 2 3.345 2 7c0 ' +
                '3.735 2.85 6.56 7.086 6.56.295 0 .58-.006.86-.025-.273.526-.47 1.12-.47 1.735 ' +
@@ -61,8 +59,7 @@ function Login(props) {
                             className={s.icon}
                             width="30"
                             height="30"
-                            viewBox="0 0 30 30"
-                            xmlns="http://www.w3.org/2000/svg" >
+                            viewBox="0 0 30 30">
                             <path d={'M30 6.708c-1.105.49-2.756 1.143-4 1.292 1.273-.762 2.54-2.56 ' +
                '3-4-.97.577-2.087 1.355-3.227 1.773L25 5c-1.12-1.197-2.23-2-4-2-3.398 0-6 ' +
                '2.602-6 6 0 .4.047.7.11.956L15 10C9 10 5.034 8.724 2 5c-.53.908-1 1.872-1 ' +
