@@ -108,7 +108,7 @@ app.get('*', async(req, res, next) => {
                 return;
             }
 
-            const css = [];
+            const css = new Set();
             let statusCode = 200;
             const data = {
                 css: '',
@@ -119,7 +119,7 @@ app.get('*', async(req, res, next) => {
                 store,
                 onPageNotFound: () => statusCode = 404,
                 insertCss(...styles) {
-                    styles.forEach(style => css.push(style._getCss()));
+                    styles.forEach(style => css.add(style._getCss()));
                 },
             };
 
@@ -143,7 +143,7 @@ app.get('*', async(req, res, next) => {
             // otherwise React will write error to console when mounting on client
 
             data.state = JSON.stringify(store.getState());
-            data.css = css.join('');
+            data.css = [...css].join('');
             const html = ReactDOM.renderToString(<Html {...data} />);
             res.status(statusCode);
             res.send(`<!doctype html>\n${html}`);
