@@ -16,3 +16,9 @@ export const head = {
         { property: 'og:creator', content: 'React Starter Kit' },
     ]
 };
+
+export const apiHost = process.env.APIHOST || 'YOUR_API_URL';
+
+export const apiHeader = [
+    { name: 'Accept-Language', value: 'en' },
+];

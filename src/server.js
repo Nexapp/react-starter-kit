@@ -19,6 +19,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/server';
 import { createMemoryHistory, match, RouterContext } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
+import proxy from 'http-proxy-middleware';
 import PrettyError from 'pretty-error';
 import passport from './core/passport';
 import models from './data/models';
@@ -29,6 +30,7 @@ import Html from './components/Html/Html';
 import { ErrorPage } from './containers/errorPage/ErrorPage';
 import errorPageStyle from './containers/errorPage/ErrorPage.css';
 import { port, auth } from './config';
+import { apiHost } from './clientConfig';
 import { Provider } from 'react-redux';
 import configureStore from './redux/configureStore';
 import { setRuntimeVariable } from './redux/reducers/runtime';
@@ -42,6 +44,19 @@ const app = express();
 // -----------------------------------------------------------------------------
 global.navigator = global.navigator || {};
 global.navigator.userAgent = global.navigator.userAgent || 'all';
+
+// Register API Proxy
+// -----------------------------------------------------------------------------
+// This need to be registered before bodyParser middleware
+if (apiHost !== '') {
+    app.use('/api', proxy({
+        target: apiHost,
+        changeOrigin: true,
+        pathRewrite: {
+            '^/api/': '/' // remove api path
+        }
+    }));
+}
 
 //
 // Register Node.js middleware
@@ -108,7 +123,7 @@ app.get('*', async(req, res, next) => {
                 return;
             }
 
-            const css = new Set();
+            const css = [];
             let statusCode = 200;
             const data = {
                 css: '',
@@ -119,7 +134,7 @@ app.get('*', async(req, res, next) => {
                 store,
                 onPageNotFound: () => statusCode = 404,
                 insertCss(...styles) {
-                    styles.forEach(style => css.add(style._getCss()));
+                    styles.forEach(style => css.push(style._getCss()));
                 },
             };
 
@@ -143,7 +158,7 @@ app.get('*', async(req, res, next) => {
             // otherwise React will write error to console when mounting on client
 
             data.state = JSON.stringify(store.getState());
-            data.css = [...css].join('');
+            data.css = css.join('');
             const html = ReactDOM.renderToString(<Html {...data} />);
             res.status(statusCode);
             res.send(`<!doctype html>\n${html}`);
